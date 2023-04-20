@@ -21,8 +21,11 @@ class ProjectSeeder extends Seeder
 
             $project = new Project();
             $project->title = $faker->unique()->sentence($faker->numberBetween(5, 10));
-            $project->content = $faker->optional()->text(500);
+            $project->client = $faker->name();
+            $project->content = $faker->paragraphs(3, true);
+            // $project->content = $faker->optional()->text(500);
             $project->slug = Str::slug($project->title, '-');
+            $project->url = $faker->optional()->url();
             $project->save();
         }
     }
