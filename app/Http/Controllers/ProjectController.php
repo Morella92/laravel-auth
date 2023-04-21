@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
+use Illuminate\Support\Str;
 
 class ProjectController extends Controller
 {
@@ -15,7 +16,7 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = Project::all();
+        $projects = Project::withTrashed()->get();
 
         return view('projects.index', compact('projects'));
     }
@@ -38,7 +39,13 @@ class ProjectController extends Controller
      */
     public function store(StoreProjectRequest $request)
     {
-        //
+        $data = $request->validated(); //richiama la form request validation
+
+        $data['slug'] = Str::slug($data['title']);
+
+        $project = Project::create($data);
+
+        return to_route('projects.show', $project);
     }
 
     /**
@@ -72,7 +79,22 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project)
     {
-        //
+        $data = $request-validated();
+
+        $data['slug'] = Str::slug($data['title']);
+
+        $project->update($data);
+
+        return to_route('projects.show', $project);
+    }
+
+    public function restore(Project $project){
+
+        if($project->trashed()){ //controllo che sia stato effettivamente cancellato
+            $project->restore(); //metodo restore per ripristinare
+        }
+
+        return back(); //riporta alla pagina precedente rispetto alla chiamata
     }
 
     /**
@@ -83,7 +105,15 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        $project->delete();
+        if($project->trashed()){
+
+            $project->forceDelete(); //eliminazione definitiva
+
+        }else{
+
+            $project->delete(); // eliminazione soft
+        }
+        
 
         return to_route('projects.index');
     }

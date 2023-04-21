@@ -13,7 +13,7 @@ class UpdateProjectRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,14 @@ class UpdateProjectRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'title' => [
+                'required',
+                'max:150',
+                Rule::unique('projects', 'title')->ignore($this->project)
+            ],
+            'client' => 'nullable|string',
+            'content'=> 'nullable|string',
+            'url' => 'nullable|string'
         ];
     }
 }
