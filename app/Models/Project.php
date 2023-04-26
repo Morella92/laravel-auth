@@ -16,4 +16,8 @@ class Project extends Model
         'content',
         'url'
     ];
+
+    //public function category(){
+        //return $this->belongsTo(Category::class, 'category_id', 'id') questi 2 parametri servono se non usiamo le convenzioni e li chiamiamo in modi diversi
+    //}
 }
